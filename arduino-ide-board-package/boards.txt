@@ -203,6 +203,9 @@ fri3d_2024_esp32s3.menu.PartitionScheme.app3M_fat9M_16MB.upload.maximum_size=314
 fri3d_2024_esp32s3.menu.PartitionScheme.rainmaker=RainMaker
 fri3d_2024_esp32s3.menu.PartitionScheme.rainmaker.build.partitions=rainmaker
 fri3d_2024_esp32s3.menu.PartitionScheme.rainmaker.upload.maximum_size=3145728
+fri3d_2024_esp32s3.menu.PartitionScheme.fri3d_micropython_3MB=Fri3d Badge micropython Partition (3MB)
+fri3d_2024_esp32s3.menu.PartitionScheme.fri3d_micropython_3MB.build.partitions=fri3d_micropython_3MB
+fri3d_2024_esp32s3.menu.PartitionScheme.fri3d_micropython_3MB.upload.maximum_size=3145728
 
 fri3d_2024_esp32s3.menu.CPUFreq.240=240MHz (WiFi)
 fri3d_2024_esp32s3.menu.CPUFreq.240.build.f_cpu=240000000L
