@@ -1,5 +1,6 @@
 #!/bin/bash
 if [ -z "$GITHUB_WORKSPACE" ]; then
+    export LOCAL_TEST_BUILD=true
     export GITHUB_WORKSPACE="$PWD"
     export GITHUB_REPOSITORY="Fri3dCamp/badge_2024_arduino"
     export GITHUB_EVENT_NAME="release"
@@ -10,13 +11,14 @@ export MODS_DIR="$GITHUB_WORKSPACE/arduino-ide-board-package"
 
 # Clone espressif/arduino-esp32 repo tag 2.0.14 as submodule
 UPSTREAM_VERSION=2.0.14
-echo "###### Start Downloading arduino-esp32-$UPSTREAM_VERSION.zip from https://github.com/espressif/arduino-esp32/archive/refs/tags/$UPSTREAM_VERSION.tar.gz"
-wget -q -O "arduino-esp32-$UPSTREAM_VERSION.zip" "https://github.com/espressif/arduino-esp32/archive/refs/tags/$UPSTREAM_VERSION.tar.gz"
-echo "###### extracting arduino-esp32-$UPSTREAM_VERSION.zip"
-tar -xzf arduino-esp32-$UPSTREAM_VERSION.zip
-export UPSTREAM_DIR="$GITHUB_WORKSPACE/arduino-esp32-$UPSTREAM_VERSION"
-echo "###### Done Downloading arduino-esp32-$UPSTREAM_VERSION.zip from https://github.com/espressif/arduino-esp32/archive/refs/tags/$UPSTREAM_VERSION.tar.gz"
-
+UPSTREAM_DIR="$GITHUB_WORKSPACE/arduino-esp32-$UPSTREAM_VERSION"
+if [ ! -d "$UPSTREAM_DIR" ]; then
+  echo "###### Start Downloading arduino-esp32-$UPSTREAM_VERSION.zip from https://github.com/espressif/arduino-esp32/archive/refs/tags/$UPSTREAM_VERSION.tar.gz"
+  wget -q -O "arduino-esp32-$UPSTREAM_VERSION.zip" "https://github.com/espressif/arduino-esp32/archive/refs/tags/$UPSTREAM_VERSION.tar.gz"
+  echo "###### extracting arduino-esp32-$UPSTREAM_VERSION.zip"
+  tar -xzf arduino-esp32-$UPSTREAM_VERSION.zip
+  echo "###### Done Downloading arduino-esp32-$UPSTREAM_VERSION.zip from https://github.com/espressif/arduino-esp32/archive/refs/tags/$UPSTREAM_VERSION.tar.gz"
+fi
 export BASE_DIR="$UPSTREAM_DIR"
 
 
@@ -231,7 +233,10 @@ PACKAGE_PATH="$OUTPUT_DIR/$PACKAGE_ZIP"
 PACKAGE_SHA=`shasum -a 256 "$PACKAGE_ZIP" | cut -f 1 -d ' '`
 PACKAGE_SIZE=`get_file_size "$PACKAGE_ZIP"`
 popd >/dev/null
-rm -rf "$PKG_DIR"
+if [ -z "$LOCAL_TEST_BUILD" ]; then
+  rm -rf "$PKG_DIR"
+fi
+
 echo "'$PACKAGE_ZIP' Created! Size: $PACKAGE_SIZE, SHA-256: $PACKAGE_SHA"
 echo
 
@@ -297,7 +302,7 @@ if [ ! -z "$prev_any_release" ] && [[ "$prev_any_release" != "null" ]]; then
     merge_package_json "$prev_any_release/$PACKAGE_JSON_DEV" "$OUTPUT_DIR/$PACKAGE_JSON_DEV"
 fi
 
-if [ "$RELEASE_PRE" == "false" ]; then
+if [[ "$RELEASE_PRE" == "false" ]]; then
     if [ ! -z "$prev_release" ] && [[ "$prev_release" != "null" ]]; then
         echo "Merging with JSON from $prev_release ..."
         merge_package_json "$prev_release/$PACKAGE_JSON_REL" "$OUTPUT_DIR/$PACKAGE_JSON_REL"
